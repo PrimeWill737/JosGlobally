@@ -251,7 +251,7 @@ export const publicPages: Record<
       },
       {
         title: "How do I install the app?",
-        body: "Use the install prompt in a supported browser. On iPhone, use Safari’s Share menu, then Add to Home Screen. Account access and financial actions require connectivity.",
+        body: "Use the Install app button. On iPhone or iPad, open the page in Safari, tap Share, then Add to Home Screen. On Android, confirm the install prompt or choose Install app from the browser menu. On Mac, use Share and Add to Dock in Safari, or the install icon in Chrome or Edge. On Windows, use the install icon in Chrome or Edge. Account access and financial actions require connectivity.",
       },
       {
         title: "How do refunds work?",

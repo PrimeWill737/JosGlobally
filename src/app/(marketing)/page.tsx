@@ -164,19 +164,19 @@ export default async function Home() {
         </div>
         <div className="metrics-grid">
           <div>
-            <span>{m ? money(m.confirmed_minor) : "—"}</span>
+            <span>{money(m?.confirmed_minor ?? 0)}</span>
             <p>Confirmed contributions</p>
           </div>
           <div>
-            <span>{m ? m.partners : "—"}</span>
+            <span>{m?.partners ?? 0}</span>
             <p>Formal partners</p>
           </div>
           <div>
-            <span>{m ? m.businesses : "—"}</span>
+            <span>{m?.businesses ?? 0}</span>
             <p>Verified enterprises</p>
           </div>
           <div>
-            <span>{m ? m.opportunities : "—"}</span>
+            <span>{m?.opportunities ?? 0}</span>
             <p>Published opportunities</p>
           </div>
           <small>

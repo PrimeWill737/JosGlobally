@@ -8,39 +8,39 @@ export async function ImpactFinancials() {
       <div className="stat-grid">
         <div className="stat">
           <small>Verified voluntary giving</small>
-          <strong>{m ? money(m.confirmed_minor) : "—"}</strong>
+          <strong>{money(m?.confirmed_minor ?? 0)}</strong>
           <p>Net of completed reversals</p>
         </div>
         <div className="stat">
           <small>Verified commercial order value</small>
-          <strong>{m ? money(m.commerce_minor) : "—"}</strong>
+          <strong>{money(m?.commerce_minor ?? 0)}</strong>
           <p>Not unrestricted donation funds</p>
         </div>
         <div className="stat">
           <small>Approved allocations</small>
-          <strong>{m ? money(m.allocated_minor) : "—"}</strong>
+          <strong>{money(m?.allocated_minor ?? 0)}</strong>
           <p>Tracked against donor restrictions</p>
         </div>
         <div className="stat">
           <small>Approved reconciled spend</small>
-          <strong>{m ? money(m.spent_minor) : "—"}</strong>
+          <strong>{money(m?.spent_minor ?? 0)}</strong>
           <p>Published with supporting evidence</p>
         </div>
         <div className="stat">
           <small>Donation reversals</small>
-          <strong>{m ? money(m.donation_refunds_minor) : "—"}</strong>
+          <strong>{money(m?.donation_refunds_minor ?? 0)}</strong>
         </div>
         <div className="stat">
           <small>Unallocated verified funds</small>
           <strong>
-            {m
-              ? money(BigInt(m.confirmed_minor) - BigInt(m.allocated_minor))
-              : "—"}
+            {money(
+              BigInt(m?.confirmed_minor ?? 0) - BigInt(m?.allocated_minor ?? 0),
+            )}
           </strong>
         </div>
         <div className="stat">
           <small>Publicly recognised supporters</small>
-          <strong>{m?.recognised ?? "—"}</strong>
+          <strong>{m?.recognised ?? 0}</strong>
           <p>Explicitly opted in</p>
         </div>
       </div>

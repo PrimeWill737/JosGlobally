@@ -34,20 +34,20 @@ export default async function Page({
         <div className="stat-grid">
           <div className="stat">
             <small>Net confirmed contributions</small>
-            <strong>{m ? money(m.confirmed_minor) : "—"}</strong>
+            <strong>{money(m?.confirmed_minor ?? 0)}</strong>
             <p>Pending transfers excluded</p>
           </div>
           <div className="stat">
             <small>Active partners</small>
-            <strong>{m?.partners ?? "—"}</strong>
+            <strong>{m?.partners ?? 0}</strong>
           </div>
           <div className="stat">
             <small>Verified enterprises</small>
-            <strong>{m?.businesses ?? "—"}</strong>
+            <strong>{m?.businesses ?? 0}</strong>
           </div>
           <div className="stat">
             <small>Published opportunities</small>
-            <strong>{m?.opportunities ?? "—"}</strong>
+            <strong>{m?.opportunities ?? 0}</strong>
           </div>
         </div>
       )}
