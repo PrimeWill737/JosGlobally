@@ -1,5 +1,9 @@
+"use client";
+import { useEffect, useId, useState } from "react";
 import Link from "next/link";
-import { Brand } from "./PublicShell";
+import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
+import { Brand } from "./Brand";
 import {
   LayoutDashboard,
   Wallet,
@@ -13,6 +17,7 @@ import {
   LifeBuoy,
   Globe2,
   LogOut,
+  ArrowLeft,
 } from "lucide-react";
 import { logout } from "@/lib/server/actions";
 import { modules } from "@/lib/modules";
@@ -28,6 +33,28 @@ const partnerNav = [
   ["settings", "Account settings", Settings],
   ["security", "Security", ShieldCheck],
 ] as const;
+function NavLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+  const active =
+    href === "/" || href === "/admin" || href === "/dashboard"
+      ? pathname === href
+      : pathname === href || pathname.startsWith(`${href}/`);
+  return (
+    <Link
+      href={href}
+      className={active ? "active" : undefined}
+      aria-current={active ? "page" : undefined}
+    >
+      {children}
+    </Link>
+  );
+}
 export function Workspace({
   children,
   admin = false,
@@ -39,43 +66,62 @@ export function Workspace({
   name: string;
   roles?: string[];
 }) {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const menuId = useId();
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
   return (
-    <div className="workspace">
-      <aside className="sidebar">
+    <div className={open ? "workspace nav-open" : "workspace"}>
+      <aside id={menuId} className="sidebar">
         <Brand />
         <p className="section-label">
           {admin ? "OPERATIONS WORKSPACE" : "PARTNER WORKSPACE"}
         </p>
-        <nav aria-label="Workspace navigation">
+        <nav aria-label="Workspace navigation" onClick={() => setOpen(false)}>
           {!admin && (
             <>
-              <Link href="/account/orders">
+              <NavLink href="/account/orders">
                 <BriefcaseBusiness size={16} />
                 Orders & quotations
-              </Link>
-              <Link href="/account/recognition">
+              </NavLink>
+              <NavLink href="/account/recognition">
                 <Users size={16} />
                 Recognition preferences
-              </Link>
+              </NavLink>
             </>
           )}
           {admin ? (
             <>
-              <Link href="/admin">
+              <NavLink href="/admin">
                 <LayoutDashboard size={16} />
                 Overview
-              </Link>
+              </NavLink>
               {roles.some((r) =>
                 ["procurement_manager", "super_admin", "auditor"].includes(r),
               ) && (
                 <>
-                  <Link href="/admin/commerce">Commerce & suppliers</Link>
-                  <Link href="/admin/quotes">Quotations</Link>
-                  <Link href="/admin/orders">Orders & fulfilment</Link>
+                  <NavLink href="/admin/commerce">Commerce & suppliers</NavLink>
+                  <NavLink href="/admin/quotes">Quotations</NavLink>
+                  <NavLink href="/admin/orders">Orders & fulfilment</NavLink>
                 </>
               )}
               {roles.includes("supplier") && (
-                <Link href="/admin/assigned-orders">Assigned orders</Link>
+                <NavLink href="/admin/assigned-orders">Assigned orders</NavLink>
               )}
               {roles.some((r) =>
                 [
@@ -84,23 +130,23 @@ export function Workspace({
                   "finance_reviewer",
                   "auditor",
                 ].includes(r),
-              ) && <Link href="/admin/funds">Restricted funds & spend</Link>}
+              ) && <NavLink href="/admin/funds">Restricted funds & spend</NavLink>}
               {roles.some((r) =>
                 ["finance_reviewer", "finance_approver", "auditor"].includes(r),
               ) && (
                 <>
-                  <Link href="/admin/payments">
+                  <NavLink href="/admin/payments">
                     <Wallet size={16} />
                     Order payments
-                  </Link>
-                  <Link href="/admin/donations">
+                  </NavLink>
+                  <NavLink href="/admin/donations">
                     <Wallet size={16} />
                     Donation verification
-                  </Link>
-                  <Link href="/admin/reconciliation">
+                  </NavLink>
+                  <NavLink href="/admin/reconciliation">
                     <FileText size={16} />
                     Reconciliation
-                  </Link>
+                  </NavLink>
                 </>
               )}
               {Object.entries(modules)
@@ -109,55 +155,57 @@ export function Workspace({
                     roles.includes("super_admin") || roles.includes(m.role),
                 )
                 .map(([k, m]) => (
-                  <Link key={k} href={`/admin/${k}`}>
+                  <NavLink key={k} href={`/admin/${k}`}>
                     <Compass size={15} />
                     {m.title}
-                  </Link>
+                  </NavLink>
                 ))}
               {roles.includes("super_admin") && (
                 <>
-                  <Link href="/admin/members">
+                  <NavLink href="/admin/members">
                     <Users size={16} />
                     Members
-                  </Link>
-                  <Link href="/admin/partners">Formal partners</Link>
-                  <Link href="/admin/recognition">Recognition consent</Link>
-                  <Link href="/admin/analytics">Analytics</Link>
-                  <Link href="/admin/compliance">Compliance</Link>
-                  <Link href="/admin/permissions">
+                  </NavLink>
+                  <NavLink href="/admin/partners">Formal partners</NavLink>
+                  <NavLink href="/admin/recognition">Recognition consent</NavLink>
+                  <NavLink href="/admin/analytics">Analytics</NavLink>
+                  <NavLink href="/admin/compliance">Compliance</NavLink>
+                  <NavLink href="/admin/permissions">
                     <ShieldCheck size={16} />
                     Permissions
-                  </Link>
-                  <Link href="/admin/settings">
+                  </NavLink>
+                  <NavLink href="/admin/settings">
                     <Settings size={16} />
                     Launch controls
-                  </Link>
+                  </NavLink>
                 </>
               )}
               {roles.some((r) => ["super_admin", "auditor"].includes(r)) && (
-                <Link href="/admin/audit">
+                <NavLink href="/admin/audit">
                   <FileText size={16} />
                   Audit log
-                </Link>
+                </NavLink>
               )}
             </>
           ) : (
             partnerNav.map(([path, title, Icon]) => (
-              <Link href={`/dashboard${path ? `/${path}` : ""}`} key={path}>
+              <NavLink href={`/dashboard${path ? `/${path}` : ""}`} key={path}>
                 <Icon size={16} />
                 {title}
-              </Link>
+              </NavLink>
             ))
           )}
         </nav>
-        <div className="sidebar-foot">
-          <Link href="/">↗ Back to the movement</Link>
+        <div className="sidebar-foot" onClick={() => setOpen(false)}>
+          <NavLink href="/">
+            <ArrowLeft size={16} aria-hidden="true" /> Back to the movement
+          </NavLink>
           {admin ? (
-            <Link href="/dashboard">Partner workspace</Link>
+            <NavLink href="/dashboard">Partner workspace</NavLink>
           ) : (
             roles.some(
               (r) => r !== "partner" && r !== "business_representative",
-            ) && <Link href="/admin">Operations dashboard</Link>
+            ) && <NavLink href="/admin">Operations dashboard</NavLink>
           )}
           <form action={logout}>
             <button
@@ -169,12 +217,38 @@ export function Workspace({
           </form>
         </div>
       </aside>
+      {open && (
+        <button
+          type="button"
+          className="nav-backdrop"
+          aria-label="Close menu"
+          onClick={() => setOpen(false)}
+        />
+      )}
       <div className="workspace-main">
         <header className="workspace-top">
-          <span>
-            Jos Globally &nbsp; / &nbsp;{" "}
-            <strong>{admin ? "Operations" : "Your partnership"}</strong>
-          </span>
+          <div className="workspace-title">
+            <button
+              type="button"
+              className="nav-toggle"
+              aria-expanded={open}
+              aria-controls={menuId}
+              onClick={() => setOpen((value) => !value)}
+            >
+              {open ? (
+                <X size={22} strokeWidth={1.6} />
+              ) : (
+                <Menu size={22} strokeWidth={1.6} />
+              )}
+              <span className="sr-only">
+                {open ? "Close menu" : "Open menu"}
+              </span>
+            </button>
+            <span>
+              Jos Globally &nbsp; / &nbsp;{" "}
+              <strong>{admin ? "Operations" : "Your partnership"}</strong>
+            </span>
+          </div>
           <div className="row">
             <span>{name}</span>
             <span className="avatar">{name.slice(0, 1).toUpperCase()}</span>

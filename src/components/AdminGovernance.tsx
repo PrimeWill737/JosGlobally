@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { database } from "@/lib/server/database";
 import { requireStaff } from "@/lib/server/auth";
 import { DataTable } from "./DataTable";
@@ -68,7 +69,7 @@ export async function AdminGovernance({ section }: { section: string }) {
               </label>
             </ActionForm>
             <Link className="text-link" href="/admin/agreements">
-              Manage agreement drafts →
+              Manage agreement drafts <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </section>
           <section>

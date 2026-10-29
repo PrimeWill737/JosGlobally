@@ -11,6 +11,7 @@ html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  overscroll-behavior-y: contain;
 }
 body {
   margin: 0;
@@ -86,6 +87,10 @@ p {
 }
 svg {
   flex-shrink: 0;
+}
+a svg,
+button svg {
+  vertical-align: -0.15em;
 }
 button {
   border: 0;
@@ -908,6 +913,10 @@ footer {
 .form .button {
   align-self: start;
 }
+.back-home {
+  width: fit-content;
+  margin: 2px 0 18px;
+}
 .notice {
   padding: 16px 20px;
   background: #e9eddf;
@@ -1021,9 +1030,41 @@ footer {
   margin-top: 30px;
   font-size: 0.875rem;
 }
-.sidebar-foot a {
-  display: block;
+.sidebar-foot a,
+.sidebar-foot button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
   padding: 8px 0;
+  text-align: left;
+}
+.workspace-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+.workspace-title > span {
+  min-width: 0;
+}
+.pull-refresh {
+  position: fixed;
+  z-index: 45;
+  top: env(safe-area-inset-top, 0px);
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: $forest;
+  color: $ivory;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.2;
+  pointer-events: none;
+  box-shadow: 0 6px 18px #123c3533;
 }
 .workspace-main {
   min-width: 0;

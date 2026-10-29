@@ -1,5 +1,6 @@
 import { PublicShell } from "@/components/PublicShell";
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 export default function Join() {
   return (
     <PublicShell>
@@ -35,7 +36,7 @@ export default function Join() {
               <h3>{title}</h3>
               <p>{body}</p>
               <Link href="/login" className="text-link">
-                Create your profile ↗
+                Create your profile <ArrowUpRight size={16} aria-hidden="true" />
               </Link>
             </article>
           ))}
@@ -43,7 +44,10 @@ export default function Join() {
         <div className="notice">
           Voluntary contributions begin at NGN 1,000 when the approved programme
           opens. They do not confer equity, ownership or guaranteed financial
-          returns. <Link href="/partnership">Read how partnership works →</Link>
+          returns.{" "}
+          <Link href="/partnership">
+            Read how partnership works <ArrowRight size={16} aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </PublicShell>

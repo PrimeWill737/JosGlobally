@@ -1,6 +1,7 @@
 import { ImpactFinancials } from "@/components/ImpactFinancials";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { publicPages } from "@/lib/content";
 import { published, metrics } from "@/lib/server/data";
 import { money, label } from "@/lib/domain";
@@ -107,7 +108,7 @@ export default async function Page({
       )}
       {p.cta && (
         <Link className="button" style={{ marginTop: 30 }} href={p.cta.href}>
-          {p.cta.text} ↗
+          {p.cta.text} <ArrowUpRight size={18} aria-hidden="true" />
         </Link>
       )}
       {["trade", "discover", "opportunities"].includes(slug) && (

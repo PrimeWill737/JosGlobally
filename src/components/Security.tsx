@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { LoaderCircle } from "lucide-react";
+import { ArrowRight, LoaderCircle } from "lucide-react";
 import { ActionForm } from "./ActionForm";
 import { PasswordInput } from "./PasswordInput";
 import { deleteAccountAction, setPasswordAction } from "@/lib/server/password-actions";
@@ -130,7 +130,7 @@ export function Security({ hasPassword = false }: { hasPassword?: boolean }) {
         )}
         {verified && (
           <Link href="/admin" className="button">
-            Continue to operations →
+            Continue to operations <ArrowRight size={16} aria-hidden="true" />
           </Link>
         )}
         <details>

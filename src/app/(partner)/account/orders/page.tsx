@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { requireSession } from "@/lib/server/auth";
 import { database } from "@/lib/server/database";
 import { money, label } from "@/lib/domain";
@@ -29,7 +30,7 @@ export default async function Orders() {
         </p>
       </div>
       <Link className="button" href="/shop">
-        Explore Shop Global ↗
+        Explore Shop Global <ArrowUpRight size={18} aria-hidden="true" />
       </Link>
       <h2 className="section-title" style={{ marginTop: 30 }}>
         Your orders
@@ -46,7 +47,10 @@ export default async function Orders() {
               <h3>{o.reference}</h3>
               <span className="badge">{label(o.status)}</span>
             </div>
-            <p>{money(o.total_minor)} · View order, invoice and timeline →</p>
+            <p>
+              {money(o.total_minor)} · View order, invoice and timeline{" "}
+              <ArrowRight size={16} aria-hidden="true" />
+            </p>
           </Link>
         ))
       ) : (
@@ -73,7 +77,8 @@ export default async function Orders() {
               </details>
               {q.status === "sent" && (
                 <Link className="button" href={`/checkout/order?quote=${q.id}`}>
-                  Review and accept quotation ↗
+                  Review and accept quotation{" "}
+                  <ArrowUpRight size={16} aria-hidden="true" />
                 </Link>
               )}
             </>

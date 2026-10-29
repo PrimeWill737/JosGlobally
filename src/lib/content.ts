@@ -170,7 +170,7 @@ export const publicPages: Record<
   },
   "china-desk": {
     title: "A bridge built on relationships.",
-    eyebrow: "Nigeria ↔ China",
+    eyebrow: "Nigeria and China",
     intro:
       "A structured enquiry desk for sourcing, appointments, market intelligence, visits and proposed trade missions.",
     sections: [

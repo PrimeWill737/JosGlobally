@@ -9,6 +9,7 @@ import { ActionForm } from "@/components/ActionForm";
 import { DataTable } from "@/components/DataTable";
 import { financeAction, roleAction, launchAction } from "@/lib/server/actions";
 import { roles, label, money } from "@/lib/domain";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 export default async function AdminSection({
   params,
 }: {
@@ -162,7 +163,7 @@ export default async function AdminSection({
             this switch does not replace those approvals.
           </p>
           <a className="text-link" href="/admin/launch">
-            Open launch checklist →
+            Open launch checklist <ArrowRight size={16} aria-hidden="true" />
           </a>
         </section>
       </>
@@ -209,7 +210,7 @@ export default async function AdminSection({
           description="Database-recorded decisions and changes. Events cannot be edited or erased."
         />
         <a className="text-link" href="/api/reports?kind=audit">
-          Export audit CSV ↗
+          Export audit CSV <ArrowUpRight size={16} aria-hidden="true" />
         </a>
         <DataTable
           rows={data ?? []}
@@ -334,9 +335,12 @@ export default async function AdminSection({
           </div>
         </div>
         <div className="link-list">
-          <a href="/api/reports?kind=ledger">Export ledger CSV ↗</a>
+          <a href="/api/reports?kind=ledger">
+            Export ledger CSV <ArrowUpRight size={16} aria-hidden="true" />
+          </a>
           <a href="/api/reports?kind=reconciliation">
-            Export bank reconciliation CSV ↗
+            Export bank reconciliation CSV{" "}
+            <ArrowUpRight size={16} aria-hidden="true" />
           </a>
         </div>
         <h2 className="section-title" style={{ marginTop: 30 }}>
@@ -368,7 +372,7 @@ export default async function AdminSection({
                 target="_blank"
                 rel="noreferrer"
               >
-                Open private evidence ↗
+                Open private evidence <ArrowUpRight size={16} aria-hidden="true" />
               </a>
             </div>
             <p className="mono">

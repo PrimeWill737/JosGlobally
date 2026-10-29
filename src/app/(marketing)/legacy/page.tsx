@@ -1,5 +1,6 @@
 import { configured, database } from "@/lib/server/database";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 export const dynamic = "force-dynamic";
 export default async function Legacy() {
   const rows = configured()
@@ -45,7 +46,7 @@ export default async function Legacy() {
         </div>
       )}
       <Link className="text-link" href="/account/recognition">
-        Manage my recognition →
+        Manage my recognition <ArrowRight size={16} aria-hidden="true" />
       </Link>
     </div>
   );

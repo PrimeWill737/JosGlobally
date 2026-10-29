@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { requireStaff } from "@/lib/server/auth";
 import { database } from "@/lib/server/database";
 import { metrics } from "@/lib/server/data";
@@ -73,7 +74,7 @@ export default async function Admin() {
           {s.roles.includes("super_admin")
             ? "Review launch readiness"
             : "Account security"}{" "}
-          ↗
+          <ArrowUpRight size={18} aria-hidden="true" />
         </Link>
       </section>
       <div className="link-list" style={{ marginBottom: 25 }}>
@@ -104,7 +105,9 @@ export default async function Admin() {
           )
           .map(([k, m]) => (
             <Link className="panel" key={k} href={`/admin/${k}`}>
-              <h3>{m.title} ↗</h3>
+              <h3>
+                {m.title} <ArrowUpRight size={16} aria-hidden="true" />
+              </h3>
               <p>{m.description}</p>
             </Link>
           ))}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Package, ArrowUpRight } from "lucide-react";
+import { Package, ArrowRight, ArrowUpRight } from "lucide-react";
 import { configured, database } from "@/lib/server/database";
 import { money, label } from "@/lib/domain";
 export const dynamic = "force-dynamic";
@@ -103,7 +103,7 @@ export default async function Shop({
             unverified stock or delivery promises.
           </p>
           <Link className="text-link" href="/dashboard/china-desk">
-            Request sourcing support →
+            Request sourcing support <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </div>
       )}

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { requireSession } from "@/lib/server/auth";
 import { database } from "@/lib/server/database";
 import { money, label } from "@/lib/domain";
@@ -64,14 +65,16 @@ export default async function Order({
             ))}
             <QuoteBreakdown quote={o.quotes} />
             <a className="text-link" href={`/api/orders/${o.id}/invoice`}>
-              Download order invoice PDF ↗
+              Download order invoice PDF{" "}
+              <ArrowUpRight size={16} aria-hidden="true" />
             </a>
             {payment &&
               ["awaiting_payment", "needs_information"].includes(
                 payment.status,
               ) && (
                 <Link href={`/checkout/order?order=${o.id}`} className="button">
-                  Payment instructions & proof ↗
+                  Payment instructions & proof{" "}
+                  <ArrowUpRight size={16} aria-hidden="true" />
                 </Link>
               )}
           </article>
@@ -116,7 +119,8 @@ export default async function Order({
             <article className="panel" key={d.id}>
               <h3>{d.title}</h3>
               <a className="text-link" href={`/api/order-documents/${d.id}`}>
-                Open private {d.kind} evidence ↗
+                Open private {d.kind} evidence{" "}
+                <ArrowUpRight size={16} aria-hidden="true" />
               </a>
             </article>
           ))}

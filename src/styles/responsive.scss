@@ -562,3 +562,57 @@ article {
     height: auto;
   }
 }
+// Account and operations panels use the same hamburger as the public site.
+@media (max-width: 64rem) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace-top {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 34;
+    background: #fffdf7;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .workspace-top .row {
+    margin-left: auto;
+  }
+  .workspace-top .nav-toggle {
+    margin-left: 0;
+  }
+  .workspace .nav-backdrop {
+    z-index: 31;
+  }
+  .workspace .sidebar {
+    display: none;
+  }
+  .workspace.nav-open .sidebar {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    z-index: 33;
+    top: calc(env(safe-area-inset-top, 0px) + 4.75rem);
+    left: 0;
+    bottom: 0;
+    width: min(19rem, calc(100vw - 3.5rem));
+    height: auto;
+    padding: 1rem 0.75rem 1.25rem;
+    overflow: auto;
+  }
+  .workspace .sidebar nav {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0;
+    overflow: visible;
+  }
+  .workspace .sidebar .section-label,
+  .workspace .sidebar-foot {
+    display: block;
+  }
+  .workspace .sidebar nav a {
+    white-space: normal;
+  }
+}

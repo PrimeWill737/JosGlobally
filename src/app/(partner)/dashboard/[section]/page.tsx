@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { requireSession } from "@/lib/server/auth";
 import { database } from "@/lib/server/database";
 import { modules, partnerModules } from "@/lib/modules";
@@ -159,7 +160,7 @@ export default async function PartnerSection({
                 target="_blank"
                 rel="noreferrer"
               >
-                Open private receipt ↗
+                Open private receipt <ArrowUpRight size={16} aria-hidden="true" />
               </a>
               <p className="mono">SHA-256 {e.sha256}</p>
             </article>
@@ -228,7 +229,8 @@ export default async function PartnerSection({
           <section className="panel">
             <h2>Support the movement</h2>
             <Link className="text-link" href="/checkout/donate">
-              Choose a project, dedication & recognition →
+              Choose a project, dedication & recognition{" "}
+              <ArrowRight size={16} aria-hidden="true" />
             </Link>
             <p>
               Voluntary participation starts at NGN 1,000. Contributions do not
@@ -274,7 +276,8 @@ export default async function PartnerSection({
                     className="text-link"
                     href={`/partners/checkout?id=${i.id}`}
                   >
-                    Details & evidence →
+                    Details & evidence{" "}
+                    <ArrowRight size={16} aria-hidden="true" />
                   </Link>
                 </article>
               ))
@@ -294,7 +297,8 @@ export default async function PartnerSection({
               {new Date(c.created_at).toLocaleDateString("en-GB")}
             </p>
             <a className="text-link" href={`/api/acknowledgements/${c.id}`}>
-              Download acknowledgement PDF ↗
+              Download acknowledgement PDF{" "}
+              <ArrowUpRight size={16} aria-hidden="true" />
             </a>
             <details>
               <summary>Request a refund or correction</summary>
@@ -331,7 +335,7 @@ async function Vault({ owner }: { owner: string }) {
             target="_blank"
             rel="noreferrer"
           >
-            Open private document ↗
+            Open private document <ArrowUpRight size={16} aria-hidden="true" />
           </a>
         </article>
       ))}

@@ -4,6 +4,7 @@ import { Workspace } from "@/components/Workspace";
 import { notFound } from "next/navigation";
 import { money, label } from "@/lib/domain";
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 export const dynamic = "force-dynamic";
 export default async function Checkout({
   searchParams,
@@ -90,7 +91,7 @@ export default async function Checkout({
             </p>
           )}
           <Link href="/dashboard/support" className="text-link">
-            Need help? →
+            Need help? <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </section>
         <section className="panel">
@@ -129,12 +130,16 @@ export default async function Checkout({
                 target is 1–2 business days after sufficient bank evidence is
                 available.
               </p>
-              <button className="button">Submit for review ↗</button>
+              <button className="button">
+                Submit for review <ArrowUpRight size={18} aria-hidden="true" />
+              </button>
             </form>
           ) : (
             <p>
               Your current status is {label(i.status).toLowerCase()}.{" "}
-              <Link href="/dashboard/contributions">Return to history →</Link>
+              <Link href="/dashboard/contributions">
+                Return to history <ArrowRight size={16} aria-hidden="true" />
+              </Link>
             </p>
           )}
         </section>

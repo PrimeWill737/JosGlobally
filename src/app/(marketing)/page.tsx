@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
-  ArrowUpRight,
   ArrowRight,
+  ArrowUpRight,
   Globe2,
   Handshake,
   Sprout,
@@ -234,7 +234,9 @@ export default async function Home() {
                 <span className="eyebrow">PLATEAU VOICES</span>
                 <h3>{s.title}</h3>
                 <p>{s.summary}</p>
-                <Link href={`/stories#${s.id}`}>Read story →</Link>
+                <Link href={`/stories#${s.id}`}>
+                  Read story <ArrowRight size={16} aria-hidden="true" />
+                </Link>
               </article>
             ))}
           </div>

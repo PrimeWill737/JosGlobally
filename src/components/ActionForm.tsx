@@ -1,6 +1,6 @@
 "use client";
 import { useActionState } from "react";
-import { LoaderCircle } from "lucide-react";
+import { ArrowUpRight, LoaderCircle } from "lucide-react";
 import type { ActionState } from "@/lib/server/actions";
 export function ActionForm({
   action,
@@ -27,7 +27,7 @@ export function ActionForm({
       >
         <span className={pending ? "button-label is-pending" : "button-label"}>
           {submit}
-          <span aria-hidden="true">↗</span>
+          <ArrowUpRight size={18} strokeWidth={1.75} aria-hidden="true" />
         </span>
         {pending && (
           <LoaderCircle

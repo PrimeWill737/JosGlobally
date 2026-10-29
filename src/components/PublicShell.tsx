@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowLeftRight, ArrowUpRight } from "lucide-react";
 import { Brand } from "./Brand";
 import { SiteHeader } from "./SiteHeader";
 export { Brand };
@@ -9,7 +9,8 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
       <div className="topline">
         <span>A movement rooted in Plateau. A vision without borders.</span>
         <Link href="/china-desk">
-          Nigeria ↔ China Desk <ArrowUpRight size={13} />
+          Nigeria <ArrowLeftRight size={13} aria-hidden="true" /> China Desk{" "}
+          <ArrowUpRight size={13} aria-hidden="true" />
         </Link>
       </div>
       <SiteHeader />

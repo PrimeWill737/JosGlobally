@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { ActionForm } from "./ActionForm";
 import { quoteRequestAction } from "@/lib/server/commerce-actions";
 type Item = { product_id: string; title: string; quantity: number };
@@ -27,11 +28,14 @@ export function AddToCart({ id, title }: { id: string; title: string }) {
           setAdded(true);
         }}
       >
-        Add to quote cart ↗
+        Add to quote cart <ArrowUpRight size={16} aria-hidden="true" />
       </button>
       {added && (
         <p role="status" className="notice">
-          Added. <Link href="/cart">Review your quote cart →</Link>
+          Added.{" "}
+          <Link href="/cart">
+            Review your quote cart <ArrowRight size={16} aria-hidden="true" />
+          </Link>
         </p>
       )}
     </>
@@ -126,7 +130,7 @@ export function Cart() {
           <h3>Your quote cart is empty.</h3>
           <p>Choose products to request a transparent landed-cost quotation.</p>
           <Link className="text-link" href="/shop">
-            Explore Shop Global →
+            Explore Shop Global <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </div>
       )}

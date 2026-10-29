@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 const policies = {
   returns: {
     title: "Commercial returns & consumer support",
@@ -24,7 +25,7 @@ export default async function Policy({
       <div className="prose">
         <p>{p.text}</p>
         <a className="text-link" href="/account/support">
-          Open a support request →
+          Open a support request <ArrowRight size={16} aria-hidden="true" />
         </a>
       </div>
     </div>

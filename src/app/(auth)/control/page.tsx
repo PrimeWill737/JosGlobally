@@ -1,5 +1,7 @@
 export const dynamic = "force-dynamic";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { PublicShell } from "@/components/PublicShell";
 import { ActionForm } from "@/components/ActionForm";
 import { PasswordInput } from "@/components/PasswordInput";
@@ -17,6 +19,10 @@ export default async function SuperAdminEntry() {
           <p className="eyebrow">RESTRICTED</p>
           <h1>Super admin</h1>
           <p>This entrance admits only the super admin.</p>
+          <Link href="/" className="button small outline back-home">
+            <ArrowLeft size={16} aria-hidden="true" />
+            Back to home
+          </Link>
           {configured() ? (
             <ActionForm action={superAdminLogin} submit="Continue">
               <label>

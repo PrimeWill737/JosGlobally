@@ -3,6 +3,7 @@ import { Manrope, DM_Serif_Display } from "next/font/google";
 import "@/styles/globals.scss";
 import "@/styles/responsive.scss";
 import { Pwa } from "@/components/Pwa";
+import { PullToRefresh } from "@/components/PullToRefresh";
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-manrope",
@@ -46,6 +47,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <div className="responsive-root">
+          <PullToRefresh />
           {children}
           <Pwa />
         </div>

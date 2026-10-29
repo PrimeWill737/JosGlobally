@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { requireSession } from "@/lib/server/auth";
 import { database } from "@/lib/server/database";
 import { money, label } from "@/lib/domain";
@@ -64,7 +65,7 @@ export default async function Dashboard() {
           </p>
         </div>
         <Link className="button ivory" href="/dashboard/settings">
-          Complete your profile ↗
+          Complete your profile <ArrowUpRight size={18} aria-hidden="true" />
         </Link>
       </section>
       <div className="stat-grid">
@@ -88,13 +89,15 @@ export default async function Dashboard() {
         <div className="stat">
           <small>Your next step</small>
           <strong>Connect</strong>
-          <Link href="/programmes">Explore programmes ↗</Link>
+          <Link href="/programmes">
+            Explore programmes <ArrowUpRight size={16} aria-hidden="true" />
+          </Link>
         </div>
       </div>
       <div className="row">
         <h2 className="section-title">Recent contributions</h2>
         <Link href="/dashboard/contributions" className="text-link">
-          View all →
+          View all <ArrowRight size={16} aria-hidden="true" />
         </Link>
       </div>
       {intents?.length ? (
@@ -120,7 +123,7 @@ export default async function Dashboard() {
                   </td>
                   <td>
                     <Link href={`/partners/checkout?id=${i.id}`}>
-                      View details ↗
+                      View details <ArrowUpRight size={16} aria-hidden="true" />
                     </Link>
                   </td>
                 </tr>
@@ -136,7 +139,7 @@ export default async function Dashboard() {
             programme opens.
           </p>
           <Link className="text-link" href="/dashboard/contributions">
-            Explore contributions →
+            Explore contributions <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </div>
       )}
@@ -148,7 +151,7 @@ export default async function Dashboard() {
           .filter((k) => !["consent", "privacy"].includes(k))
           .map((k) => (
             <Link key={k} href={`/dashboard/${k}`}>
-              {modules[k].title} ↗
+              {modules[k].title} <ArrowUpRight size={16} aria-hidden="true" />
             </Link>
           ))}
       </div>

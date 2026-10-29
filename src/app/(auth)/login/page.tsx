@@ -1,4 +1,6 @@
 export const dynamic = "force-dynamic";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { passwordLogin, signupAction } from "@/lib/server/password-actions";
 import { PublicShell } from "@/components/PublicShell";
 import { ActionForm } from "@/components/ActionForm";
@@ -24,6 +26,10 @@ export default async function Login({
             Sign in with your password, or create an account and choose one
             now.
           </p>
+          <Link href="/" className="button small outline back-home">
+            <ArrowLeft size={16} aria-hidden="true" />
+            Back to home
+          </Link>
           {error && (
             <p className="notice error">
               This confirmation link has expired or is invalid. Create your
