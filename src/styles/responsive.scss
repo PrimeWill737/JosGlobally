@@ -13,7 +13,21 @@ body {
 }
 @media (max-width: 48rem) {
   html {
-    font-size: calc(81.25% - 3px);
+    font-size: calc(81.25% - 1px);
+  }
+  body {
+    overflow-wrap: break-word;
+  }
+  h1,
+  h2,
+  h3,
+  p,
+  li,
+  .brand,
+  .eyebrow,
+  .notice,
+  .form label {
+    text-wrap: pretty;
   }
 }
 .responsive-root {
@@ -397,7 +411,21 @@ article {
 // Short landscape phones, including iPhone landscape.
 @media (max-height: 32rem) and (max-width: 64rem) {
   html {
-    font-size: calc(81.25% - 3px);
+    font-size: calc(81.25% - 1px);
+  }
+  body {
+    overflow-wrap: break-word;
+  }
+  h1,
+  h2,
+  h3,
+  p,
+  li,
+  .brand,
+  .eyebrow,
+  .notice,
+  .form label {
+    text-wrap: pretty;
   }
 }
 @media (orientation: landscape) and (max-height: 32rem) and (min-width: 36rem) {
