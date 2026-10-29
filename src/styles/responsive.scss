@@ -1,0 +1,508 @@
+// Adapt to available content width, including split-screen windows,
+// iPhone sizes, and dual-screen / foldable devices.
+body {
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+// General type steps down on smaller screens. rem media queries use the
+// browser's default size, so these breakpoints stay stable.
+@media (max-width: 64rem) {
+  html {
+    font-size: calc(87.5% - 3px);
+  }
+}
+@media (max-width: 48rem) {
+  html {
+    font-size: calc(81.25% - 3px);
+  }
+}
+.responsive-root {
+  container-type: inline-size;
+  min-width: 0;
+}
+img,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+img,
+video {
+  height: auto;
+}
+pre {
+  max-width: 100%;
+  overflow: auto;
+}
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+  min-width: 0;
+}
+.button {
+  white-space: normal;
+  text-align: center;
+}
+.row,
+.mission-strip,
+.hero-foot {
+  flex-wrap: wrap;
+}
+.row > *,
+.form,
+.step > *,
+.image-card > *,
+.brand > * {
+  min-width: 0;
+}
+.card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+.workspace-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+}
+.stat-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+.table-wrap {
+  max-width: 100%;
+  overscroll-behavior-inline: contain;
+}
+.table-wrap table {
+  min-width: 36rem;
+}
+.sidebar {
+  height: 100dvh;
+}
+.workspace {
+  min-height: 100dvh;
+}
+main,
+header,
+footer,
+section,
+nav,
+form,
+article {
+  min-width: 0;
+  max-width: 100%;
+}
+.pwa-status {
+  max-width: min(330px, calc(100% - 32px));
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: max(16px, env(safe-area-inset-bottom, 0px));
+}
+@container (max-width: 1024px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: relative;
+    height: auto;
+    padding: 1rem;
+  }
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  .sidebar .section-label {
+    margin: 1rem 0 0.5rem;
+  }
+  .sidebar-foot {
+    margin-top: 1rem;
+    padding: 0.5rem;
+  }
+}
+@container (max-width: 768px) {
+  .hero,
+  .split-section,
+  .impact-section,
+  .workspace-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pillar-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .footer-top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .site-header,
+  .header-actions {
+    gap: 1rem;
+  }
+  .section-heading,
+  .dashboard-welcome {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  h1,
+  .hero h1,
+  .public-page .page-heading h1,
+  .auth-panel h1 {
+    font-size: clamp(1.8rem, 6.2cqi, 2.45rem);
+  }
+  h2,
+  .join-banner h2 {
+    font-size: clamp(1.55rem, 5cqi, 2.1rem);
+  }
+  h3,
+  .panel h2,
+  .section-title {
+    font-size: 1.05rem;
+  }
+  .hero-art {
+    display: flex;
+    flex-direction: column;
+    min-height: 20rem;
+  }
+  .editorial-art {
+    min-height: 16rem;
+  }
+  .editorial-art > p {
+    font-size: clamp(1.7rem, 6cqi, 2.15rem) !important;
+  }
+  .hero-description,
+  .panel p,
+  .auth-panel p,
+  .empty p,
+  .prose p {
+    font-size: 1rem;
+  }
+  small,
+  .brand small,
+  .sidebar .brand small,
+  .hero .eyebrow,
+  .eyebrow,
+  .badge,
+  .mono,
+  .notice,
+  .form label,
+  .footer-bottom,
+  .metrics-grid small,
+  .metrics-grid p,
+  .hero-foot p,
+  .landscape-label span,
+  .art-caption,
+  .product-art span,
+  .topline,
+  .stat p,
+  .sidebar .section-label {
+    font-size: 0.875rem;
+  }
+  .site-header nav,
+  .sidebar nav a,
+  .button,
+  .text-link {
+    font-size: 0.9375rem;
+  }
+  .art-caption {
+    padding: 1rem 1rem 0;
+    letter-spacing: 0.08em;
+  }
+  .sidebar nav a {
+    min-height: 44px;
+  }
+  .workspace-content,
+  .workspace-top,
+  .public-page {
+    padding-inline: 1rem;
+  }
+  .panel,
+  .auth-panel {
+    padding: 1rem;
+  }
+  .image-card {
+    position: relative;
+    inset: auto;
+    margin: auto 1rem 1rem;
+    flex-wrap: wrap;
+  }
+  .art-caption {
+    padding-inline: 1rem;
+  }
+  .landscape-label {
+    left: 1rem;
+    right: 1rem;
+  }
+}
+@container (max-width: 480px) {
+  .pillar-grid,
+  .footer-top,
+  .metrics-grid,
+  .stat-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .hero-actions {
+    align-items: stretch;
+  }
+  .hero-actions > * {
+    width: 100%;
+  }
+  .editorial-art {
+    padding: 1.25rem;
+  }
+  .editorial-art > p {
+    font-size: 1.7rem !important;
+  }
+  .step {
+    gap: 0.75rem;
+  }
+  .join-banner {
+    padding-inline: 1rem;
+  }
+  .metrics-grid span {
+    font-size: 1.65rem;
+  }
+  .auth-panel h1 {
+    font-size: 1.85rem;
+  }
+}
+// iPhone SE and other very narrow phones.
+@container (max-width: 360px) {
+  .topline,
+  .site-header,
+  .hero,
+  .section,
+  .mission-strip,
+  .impact-section,
+  footer,
+  .public-page,
+  .workspace-content,
+  .workspace-top {
+    padding-inline: 0.875rem;
+  }
+  .brand small {
+    letter-spacing: 0.02em;
+  }
+  .header-actions .button {
+    width: 100%;
+  }
+  .site-header nav {
+    justify-content: flex-start;
+  }
+  .stat strong,
+  .metrics-grid span {
+    font-size: 1.45rem;
+  }
+}
+// Phones and tablets: navigation lives in the hamburger.
+@media (max-width: 64rem) {
+  .site-header {
+    flex-wrap: nowrap;
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 30;
+    background: #f5f2e9;
+  }
+  .site-header::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    background: #f5f2e9;
+  }
+  .nav-toggle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-left: auto;
+    flex-shrink: 0;
+    border: 1px solid #b8c1b7;
+    border-radius: 4px;
+    background: #f5f2e9;
+    color: #123c35;
+    position: relative;
+    z-index: 3;
+  }
+  .brand {
+    position: relative;
+    z-index: 3;
+  }
+  .nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    border: 0;
+    padding: 0;
+    background: #17252266;
+  }
+  .site-nav {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    max-height: calc(100dvh - 4.5rem);
+    overflow: auto;
+    padding: 0.25rem 1.25rem 1.25rem;
+    background: #f5f2e9;
+    border-bottom: 1px solid #123c3518;
+    box-shadow: 0 16px 32px #123c3518;
+    z-index: 3;
+  }
+  .site-header.nav-open .site-nav {
+    display: flex;
+  }
+  .site-header nav {
+    order: 0;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding-top: 0;
+  }
+  .site-nav nav a {
+    border-bottom: 1px solid #123c3514;
+  }
+  .site-nav .header-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding-top: 1rem;
+  }
+  .site-nav .header-actions .button {
+    width: 100%;
+    justify-content: center;
+  }
+  .site-nav .login-link {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+// 16px keeps iOS from zooming the page when a field is focused.
+@media (max-width: 48rem) {
+  input,
+  select,
+  textarea,
+  .form input,
+  .form select,
+  .form textarea {
+    font-size: 16px;
+  }
+}
+// Short landscape phones, including iPhone landscape.
+@media (max-height: 32rem) and (max-width: 64rem) {
+  html {
+    font-size: calc(81.25% - 3px);
+  }
+}
+@media (orientation: landscape) and (max-height: 32rem) and (min-width: 36rem) {
+  .hero {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    gap: 1rem;
+  }
+  .hero-copy {
+    padding-top: 0;
+  }
+  .hero-art,
+  .editorial-art,
+  .product-art.large {
+    min-height: 12rem;
+  }
+  .hero-foot {
+    margin-top: 1rem;
+  }
+  .section,
+  .public-page,
+  .join-banner {
+    padding-block: 2rem;
+  }
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sidebar {
+    position: relative;
+    height: auto;
+  }
+  .site-header {
+    padding-block: 0.75rem;
+  }
+  h1,
+  .hero h1,
+  .public-page .page-heading h1,
+  .auth-panel h1 {
+    font-size: clamp(1.7rem, 4vw, 2.15rem);
+  }
+  h2,
+  .join-banner h2 {
+    font-size: clamp(1.45rem, 3.5vw, 1.9rem);
+  }
+}
+// Dual-screen and foldable devices (Surface Duo, foldables, and similar).
+// Unfolded: use the full device. Folded: stay inside the visible pane.
+// Browsers without these features keep the width-based layout above.
+@media (horizontal-viewport-segments: 2) {
+  .responsive-root {
+    width: 100%;
+    max-width: 100%;
+  }
+  .pwa-status {
+    left: max(1rem, env(safe-area-inset-left, 0px));
+    right: auto;
+    max-width: calc(env(viewport-segment-width 0 0, 100%) - 2rem);
+  }
+}
+@media (horizontal-viewport-segments: 2) and (device-posture: folded) {
+  .responsive-root {
+    width: min(100%, env(viewport-segment-width 0 0, 100%));
+    max-width: env(viewport-segment-width 0 0, 100%);
+  }
+}
+@media (vertical-viewport-segments: 2) {
+  .responsive-root {
+    width: 100%;
+    max-width: 100%;
+  }
+  .hero-art,
+  .editorial-art {
+    min-height: 14rem;
+  }
+  .pwa-status {
+    position: sticky;
+    margin: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  }
+}
+@media (vertical-viewport-segments: 2) and (device-posture: folded) {
+  .responsive-root {
+    max-height: env(viewport-segment-height 0 0, 100dvh);
+    overflow: auto;
+  }
+}
+@media (spanning: single-fold-vertical), (spanning: single-fold-horizontal) {
+  .responsive-root {
+    width: 100%;
+    max-width: 100%;
+  }
+  .hero,
+  .split-section,
+  .impact-section,
+  .workspace,
+  .footer-top,
+  .pillar-grid,
+  .card-grid {
+    max-width: 100%;
+  }
+  .hero-art,
+  .editorial-art,
+  .sidebar {
+    min-height: 0;
+    height: auto;
+  }
+}

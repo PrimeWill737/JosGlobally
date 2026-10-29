@@ -1,0 +1,9 @@
+const VERSION='jg-public-v2';
+// Auth/RSC/API requests never enter caches. Cache only full HTML at explicit public paths.
+const PUBLIC_PAGES=new Set(['/','/movement','/about','/faq','/partnership','/discover','/trade','/stories']);
+self.addEventListener('install',event=>event.waitUntil(caches.open(VERSION).then(cache=>cache.addAll(['/offline.html','/icons/icon-192.png']))));
+self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==VERSION).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
+self.addEventListener('message',event=>{if(event.data?.type==='SKIP_WAITING')self.skipWaiting();});
+self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(event.request.method!=='GET'||url.origin!==self.location.origin)return;if(event.request.mode==='navigate')event.respondWith((async()=>{try{const response=await fetch(event.request);if(PUBLIC_PAGES.has(url.pathname)&&!url.search&&response.ok&&!response.redirected&&response.headers.get('content-type')?.includes('text/html')){const cache=await caches.open(VERSION);await cache.put(url.pathname,response.clone());}return response;}catch{if(PUBLIC_PAGES.has(url.pathname)&&!url.search){const cached=await caches.match(url.pathname);if(cached)return cached;}return await caches.match('/offline.html');}})());});
+self.addEventListener('push',event=>{let data={title:'Jos Globally',body:'A new update is available in your dashboard.'};try{data={...data,...event.data.json()};}catch{}event.waitUntil(self.registration.showNotification(data.title,{body:data.body,icon:'/icons/icon-192.png',tag:'jos-update',data:{url:'/dashboard/notifications'}}));});
+self.addEventListener('notificationclick',event=>{event.notification.close();event.waitUntil(self.clients.openWindow('/dashboard/notifications'));});
