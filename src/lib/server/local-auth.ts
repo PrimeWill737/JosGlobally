@@ -9,6 +9,7 @@ import {
   createDecipheriv,
 } from "node:crypto";
 import { promisify } from "node:util";
+import { appUrl } from "./app-url";
 import { sendAuthEmail } from "./email";
 import { pool, type Identity } from "./postgres";
 const scrypt = promisify(scryptCb);
@@ -36,9 +37,7 @@ export async function createSession(userId: string) {
   );
   (await cookies()).set(cookieName, token, {
     httpOnly: true,
-    secure:
-      process.env.NODE_ENV === "production" &&
-      process.env.APP_URL?.startsWith("https://") === true,
+    secure: process.env.NODE_ENV === "production" && appUrl().startsWith("https://"),
     sameSite: "lax",
     path: "/",
     maxAge: 43200,
@@ -115,7 +114,7 @@ export async function magicLink(email: string, pendingPasswordHash?: string) {
   try {
     await sendAuthEmail(
       normalized,
-      `${process.env.APP_URL || "http://localhost:3000"}/auth/callback?token=${token}`,
+      `${appUrl()}/auth/callback?token=${token}`,
       pendingPasswordHash ? "signup" : "signin",
     );
   } catch (e) {

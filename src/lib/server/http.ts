@@ -1,5 +1,6 @@
 import "server-only";
 import { NextResponse } from "next/server";
+import { appUrl } from "@/lib/server/app-url";
 import { database, service } from "@/lib/server/database";
 import { createHash } from "node:crypto";
 export async function apiSession(request?: Request) {
@@ -7,7 +8,7 @@ export async function apiSession(request?: Request) {
     const origin = request.headers.get("origin");
     if (
       !origin ||
-      origin !== new URL(process.env.APP_URL || "http://localhost:3000").origin
+      origin !== new URL(appUrl()).origin
     )
       throw new Error("Invalid request origin.");
   }

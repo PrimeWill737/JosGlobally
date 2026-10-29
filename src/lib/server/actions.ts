@@ -2,6 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { z } from "zod";
+import { appUrl } from "@/lib/server/app-url";
 import { database, service } from "@/lib/server/database";
 import { requireSession, requireStaff } from "./auth";
 import { modules, partnerModules, contentModules } from "@/lib/modules";
@@ -36,7 +37,7 @@ export async function loginAction(
     const db = await database();
     const { error: e } = await db.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${process.env.APP_URL}/auth/callback` },
+      options: { emailRedirectTo: `${appUrl()}/auth/callback` },
     });
     if (e) throw e;
     return {

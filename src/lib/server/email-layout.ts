@@ -1,3 +1,5 @@
+import { appUrl } from "./app-url";
+
 const forest = "#123c35";
 const gold = "#c6a15b";
 const ivory = "#f5f2e9";
@@ -64,7 +66,7 @@ export function renderEmail({
       </tr>`,
     )
     .join("");
-  const origin = (process.env.APP_URL || "").replace(/\/$/, "");
+  const origin = appUrl();
   const badge = origin
     ? `<td style="padding:0 14px 0 0;vertical-align:middle;"><img src="${escapeHtml(origin)}/brand/emblem-badge.png" width="44" height="44" alt="" style="display:block;width:44px;height:44px;border:0;"></td>`
     : "";
