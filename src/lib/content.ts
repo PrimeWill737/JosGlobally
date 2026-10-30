@@ -313,7 +313,7 @@ export const publicPages: Record<
       },
       {
         title: "Evidence and verification",
-        body: "Receipts are limited to 5 MB PDF, JPEG or PNG files, scanned before storage and hashed for duplicate detection. Bank matching checks reference, amount, destination and date. Independent approval is required.",
+        body: "Receipts are limited to 5 MB PDF, JPEG or PNG files and hashed for duplicate detection. Bank matching checks reference, amount, destination and date. Independent approval is required.",
       },
       {
         title: "Your acknowledgement",

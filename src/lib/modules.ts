@@ -512,6 +512,9 @@ export const partnerModules = [
   "consent",
   "privacy",
 ];
+export function memberModule(key: string) {
+  return partnerModules.includes(key);
+}
 export const contentModules = [
   "stories",
   "destinations",

@@ -1,5 +1,5 @@
 import { costFields, commercialDisclosures } from "@/lib/commerce";
-import { money, label } from "@/lib/domain";
+import { money, label, shown } from "@/lib/domain";
 export function QuoteBreakdown({ quote: q }: { quote: Record<string, any> }) {
   return (
     <div className="record">
@@ -25,7 +25,7 @@ export function QuoteBreakdown({ quote: q }: { quote: Record<string, any> }) {
         <div>
           <dt>Exchange rate and validity</dt>
           <dd>
-            {q.fx_rate ?? "—"} · {q.fx_source ?? "—"} · {q.fx_at ?? "—"}
+            {q.fx_rate ?? "—"} · {q.fx_source ?? "—"} · {shown(q.fx_at)}
           </dd>
         </div>
         <div>

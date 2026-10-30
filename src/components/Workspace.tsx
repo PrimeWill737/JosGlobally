@@ -69,6 +69,7 @@ export function Workspace({
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const menuId = useId();
+  const control = Boolean(admin && roles.includes("super_admin"));
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
@@ -86,11 +87,19 @@ export function Workspace({
     };
   }, [open]);
   return (
-    <div className={open ? "workspace nav-open" : "workspace"}>
+    <div
+      className={["workspace", open && "nav-open", control && "control"]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <aside id={menuId} className="sidebar">
         <Brand />
         <p className="section-label">
-          {admin ? "OPERATIONS WORKSPACE" : "PARTNER WORKSPACE"}
+          {control
+            ? "CONTROL PANEL"
+            : admin
+              ? "OPERATIONS WORKSPACE"
+              : "PARTNER WORKSPACE"}
         </p>
         <nav aria-label="Workspace navigation" onClick={() => setOpen(false)}>
           {!admin && (
@@ -105,7 +114,88 @@ export function Workspace({
               </NavLink>
             </>
           )}
-          {admin ? (
+          {control ? (
+            <>
+              <NavLink href="/admin">
+                <LayoutDashboard size={16} />
+                Overview
+              </NavLink>
+              <p className="section-label">People</p>
+              <NavLink href="/admin/members">
+                <Users size={16} />
+                Members
+              </NavLink>
+              <NavLink href="/admin/permissions">
+                <ShieldCheck size={16} />
+                Permissions
+              </NavLink>
+              <NavLink href="/admin/partners">Formal partners</NavLink>
+              <NavLink href="/admin/recognition">Recognition</NavLink>
+              <p className="section-label">Contributions</p>
+              <NavLink href="/admin/donations">
+                <Wallet size={16} />
+                Verify contributions
+              </NavLink>
+              <NavLink href="/admin/payments">Order payments</NavLink>
+              <NavLink href="/admin/reconciliation">Reconciliation</NavLink>
+              <NavLink href="/admin/funds">Restricted funds</NavLink>
+              <NavLink href="/admin/audit">
+                <FileText size={16} />
+                Audit log
+              </NavLink>
+              <p className="section-label">Platform</p>
+              <NavLink href="/admin/settings">
+                <Settings size={16} />
+                Launch controls
+              </NavLink>
+              <NavLink href="/admin/commerce">Commerce</NavLink>
+              <NavLink href="/admin/orders">Orders</NavLink>
+              <NavLink href="/admin/quotes">Quotations</NavLink>
+              <NavLink href="/admin/compliance">Compliance</NavLink>
+              <NavLink href="/admin/analytics">Analytics</NavLink>
+              <p className="section-label">Publish</p>
+              {(
+                [
+                  ["programmes", "Programmes"],
+                  ["projects", "Projects"],
+                  ["campaigns", "Campaigns"],
+                  ["stories", "Stories"],
+                  ["reports", "Reports"],
+                  ["governance", "Governance"],
+                  ["pages", "Pages"],
+                  ["destinations", "Destinations"],
+                  ["experiences", "Experiences"],
+                  ["launch", "Launch readiness"],
+                  ["risks", "Risks"],
+                ] as const
+              ).map(([path, title]) => (
+                <NavLink key={path} href={`/admin/${path}`}>
+                  {title}
+                </NavLink>
+              ))}
+              <p className="section-label">Review member records</p>
+              {(
+                [
+                  ["applications", "Applications"],
+                  ["business", "Business profiles"],
+                  ["products", "Products"],
+                  ["trade-enquiries", "Trade enquiries"],
+                  ["china-desk", "China desk"],
+                  ["investor-enquiries", "Investor enquiries"],
+                  ["diaspora", "Diaspora"],
+                  ["readiness", "Readiness"],
+                  ["organisations", "Organisations"],
+                  ["support", "Support"],
+                  ["consent", "Consent"],
+                  ["privacy", "Privacy requests"],
+                ] as const
+              ).map(([path, title]) => (
+                <NavLink key={path} href={`/admin/${path}`}>
+                  {title}
+                </NavLink>
+              ))}
+            </>
+          ) : admin ? (
             <>
               <NavLink href="/admin">
                 <LayoutDashboard size={16} />
@@ -150,10 +240,7 @@ export function Workspace({
                 </>
               )}
               {Object.entries(modules)
-                .filter(
-                  ([, m]) =>
-                    roles.includes("super_admin") || roles.includes(m.role),
-                )
+                .filter(([, m]) => roles.includes(m.role))
                 .map(([k, m]) => (
                   <NavLink key={k} href={`/admin/${k}`}>
                     <Compass size={15} />
@@ -200,12 +287,20 @@ export function Workspace({
           <NavLink href="/">
             <ArrowLeft size={16} aria-hidden="true" /> Back to the movement
           </NavLink>
-          {admin ? (
+          {control ? (
+            <NavLink href="/dashboard">Member account</NavLink>
+          ) : admin ? (
             <NavLink href="/dashboard">Partner workspace</NavLink>
           ) : (
             roles.some(
               (r) => r !== "partner" && r !== "business_representative",
-            ) && <NavLink href="/admin">Operations dashboard</NavLink>
+            ) && (
+              <NavLink href="/admin">
+                {roles.includes("super_admin")
+                  ? "Control panel"
+                  : "Operations dashboard"}
+              </NavLink>
+            )
           )}
           <form action={logout}>
             <button
@@ -244,15 +339,26 @@ export function Workspace({
                 {open ? "Close menu" : "Open menu"}
               </span>
             </button>
-            <span>
-              Jos Globally &nbsp; / &nbsp;{" "}
-              <strong>{admin ? "Operations" : "Your partnership"}</strong>
+            <span className="workspace-crumb">
+              <span className="crumb-brand">Jos Globally</span>
+              <span className="crumb-sep" aria-hidden="true">
+                /
+              </span>
+              <strong>
+                {control
+                  ? "Control panel"
+                  : admin
+                    ? "Operations"
+                    : "Your partnership"}
+              </strong>
             </span>
           </div>
-          <div className="row">
-            <span>{name}</span>
-            <span className="avatar">{name.slice(0, 1).toUpperCase()}</span>
-          </div>
+          <p className="workspace-user">
+            <span className="workspace-user-name">{name}</span>
+            <span className="avatar" aria-hidden="true">
+              {name.slice(0, 1).toUpperCase()}
+            </span>
+          </p>
         </header>
         <main id="main" className="workspace-content">
           {children}

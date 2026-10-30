@@ -1,4 +1,4 @@
-import { label } from "@/lib/domain";
+import { label, shown } from "@/lib/domain";
 export function DataTable({
   rows,
   columns,
@@ -25,11 +25,7 @@ export function DataTable({
           {rows.map((r, index) => (
             <tr key={String(r.id ?? index)}>
               {columns.map((c) => (
-                <td key={c}>
-                  {typeof r[c] === "object"
-                    ? JSON.stringify(r[c])
-                    : String(r[c] ?? "—")}
-                </td>
+                <td key={c}>{shown(r[c])}</td>
               ))}
             </tr>
           ))}

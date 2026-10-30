@@ -4,15 +4,16 @@ import { Workspace } from "@/components/Workspace";
 import { notFound } from "next/navigation";
 import { money, label } from "@/lib/domain";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { FileForm } from "@/components/FileForm";
 export const dynamic = "force-dynamic";
 export default async function Checkout({
   searchParams,
 }: {
-  searchParams: Promise<{ id?: string }>;
+  searchParams: Promise<{ id?: string; notice?: string }>;
 }) {
   const s = await requireSession();
-  const { id } = await searchParams;
+  const { id, notice } = await searchParams;
   const db = await database();
   if (!id || !/^[a-f0-9-]{36}$/i.test(id)) notFound();
   const { data: i } = await db
@@ -96,13 +97,13 @@ export default async function Checkout({
         </section>
         <section className="panel">
           <h2>Submit transfer evidence</h2>
+          {notice && (
+            <p className="notice error" role="alert">
+              {notice.slice(0, 300)}
+            </p>
+          )}
           {open ? (
-            <form
-              className="form"
-              action="/api/evidence"
-              method="post"
-              encType="multipart/form-data"
-            >
+            <FileForm action="/api/evidence" submit="Submit for review">
               <input name="intent_id" type="hidden" value={i.id} />
               <label>
                 Bank transfer reference
@@ -126,14 +127,11 @@ export default async function Checkout({
                 />
               </label>
               <p>
-                Files are scanned, hashed and stored privately. The review
+                Files are checked, hashed and stored privately. The review
                 target is 1–2 business days after sufficient bank evidence is
                 available.
               </p>
-              <button className="button">
-                Submit for review <ArrowUpRight size={18} aria-hidden="true" />
-              </button>
-            </form>
+            </FileForm>
           ) : (
             <p>
               Your current status is {label(i.status).toLowerCase()}.{" "}

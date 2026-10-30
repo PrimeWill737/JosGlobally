@@ -3,14 +3,38 @@ import { NextResponse } from "next/server";
 import { appUrl } from "@/lib/server/app-url";
 import { database, service } from "@/lib/server/database";
 import { createHash } from "node:crypto";
+const allowedSites = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "https://josglobally.com",
+  "https://www.josglobally.com",
+];
+function trustedOrigins(request: Request) {
+  const allowed = new Set<string>(allowedSites);
+  try {
+    allowed.add(new URL(request.url).origin);
+  } catch {
+    /* The request URL is still checked below. */
+  }
+  try {
+    allowed.add(new URL(appUrl()).origin);
+  } catch {
+    /* A bad public URL must not widen the allow-list. */
+  }
+  return allowed;
+}
 export async function apiSession(request?: Request) {
   if (request && request.method !== "GET") {
     const origin = request.headers.get("origin");
-    if (
-      !origin ||
-      origin !== new URL(appUrl()).origin
-    )
-      throw new Error("Invalid request origin.");
+    let allowed = false;
+    if (origin) {
+      try {
+        allowed = trustedOrigins(request).has(new URL(origin).origin);
+      } catch {
+        allowed = false;
+      }
+    }
+    if (!allowed) throw new Error("Invalid request origin.");
   }
   const db = await database();
   const {
@@ -19,13 +43,34 @@ export async function apiSession(request?: Request) {
   if (!user) throw new Error("Sign in required.");
   return { db, user };
 }
-export function fail(e: unknown) {
-  return NextResponse.json(
-    {
-      error:
-        e instanceof Error ? e.message : "The request could not be completed.",
-    },
-    { status: 400, headers: { "Cache-Control": "private, no-store" } },
+function formReturn(request: Request, message: string) {
+  const dest = request.headers.get("sec-fetch-dest");
+  if (dest !== "document" && dest !== "iframe") return null;
+  const referer = request.headers.get("referer");
+  if (!referer) return null;
+  try {
+    const back = new URL(referer);
+    const here = new URL(request.url);
+    if (back.origin !== here.origin || back.pathname.startsWith("/api/"))
+      return null;
+    back.searchParams.set("notice", message.slice(0, 300));
+    return NextResponse.redirect(back, {
+      status: 303,
+      headers: { "Cache-Control": "private, no-store" },
+    });
+  } catch {
+    return null;
+  }
+}
+export function fail(e: unknown, request?: Request) {
+  const message =
+    e instanceof Error ? e.message : "The request could not be completed.";
+  return (
+    (request && formReturn(request, message)) ||
+    NextResponse.json(
+      { error: message },
+      { status: 400, headers: { "Cache-Control": "private, no-store" } },
+    )
   );
 }
 export async function scannedFile(form: FormData) {
@@ -66,21 +111,6 @@ export async function scannedFile(form: FormData) {
     throw new Error(
       "The file contents, extension and MIME type must match PDF, JPEG or PNG.",
     );
-  if (!process.env.MALWARE_SCAN_URL || !process.env.MALWARE_SCAN_TOKEN)
-    throw new Error(
-      "Secure upload scanning is not configured yet. Please contact support; no file was stored.",
-    );
-  const response = await fetch(process.env.MALWARE_SCAN_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/octet-stream",
-      Authorization: `Bearer ${process.env.MALWARE_SCAN_TOKEN}`,
-    },
-    body: bytes,
-    signal: AbortSignal.timeout(30000),
-  });
-  if (!response.ok || (await response.json()).clean !== true)
-    throw new Error("The file did not pass the security scan.");
   return {
     bytes,
     mime,

@@ -1,5 +1,5 @@
 "use server";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 import { z } from "zod";
 import { headers } from "next/headers";
 import { pool } from "./postgres";
@@ -45,13 +45,18 @@ export async function passwordLogin(
         "Email or password is incorrect, or this account is not verified.",
       );
     await createSession(user.id);
+    const { rows: admins } = await pool.query(
+      "select 1 from role_assignments where user_id=$1 and role='super_admin' and (expires_at is null or expires_at>now())",
+      [user.id],
+    );
+    redirect(admins.length ? "/admin" : "/dashboard");
   } catch (e) {
+    unstable_rethrow(e);
     return {
       ok: false,
       message: e instanceof Error ? e.message : "Sign-in failed.",
     };
   }
-  redirect("/dashboard");
 }
 export async function superAdminLogin(
   _: ActionState,

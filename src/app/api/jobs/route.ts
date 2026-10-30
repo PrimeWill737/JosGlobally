@@ -20,36 +20,31 @@ export async function POST(request: Request) {
   for (const job of jobs ?? []) {
     try {
       if (job.kind !== "push") throw new Error("Unsupported job type");
-      if (
-        !process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
-        !process.env.VAPID_PRIVATE_KEY ||
-        !process.env.VAPID_SUBJECT
-      )
-        throw new Error("Push delivery not configured");
-      webpush.setVapidDetails(
-        process.env.VAPID_SUBJECT,
-        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-        process.env.VAPID_PRIVATE_KEY,
-      );
-      const { data: subs, error: e } = await db
-        .from("push_subscriptions")
-        .select("*")
-        .eq("owner_id", job.payload.owner_id);
-      if (e) throw e;
-      for (const sub of subs ?? []) {
-        try {
-          await webpush.sendNotification(
-            { endpoint: sub.endpoint, keys: sub.keys },
-            JSON.stringify({
-              title: job.payload.title,
-              body: job.payload.body,
-            }),
-          );
-        } catch (e) {
-          const status = (e as { statusCode?: number }).statusCode;
-          if (status === 410 || status === 404)
-            await db.from("push_subscriptions").delete().eq("id", sub.id);
-          else throw e;
+      const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      const privateKey = process.env.VAPID_PRIVATE_KEY;
+      const subject = process.env.VAPID_SUBJECT;
+      if (publicKey && privateKey && subject) {
+        webpush.setVapidDetails(subject, publicKey, privateKey);
+        const { data: subs, error: e } = await db
+          .from("push_subscriptions")
+          .select("*")
+          .eq("owner_id", job.payload.owner_id);
+        if (e) throw e;
+        for (const sub of subs ?? []) {
+          try {
+            await webpush.sendNotification(
+              { endpoint: sub.endpoint, keys: sub.keys },
+              JSON.stringify({
+                title: job.payload.title,
+                body: job.payload.body,
+              }),
+            );
+          } catch (e) {
+            const status = (e as { statusCode?: number }).statusCode;
+            if (status === 410 || status === 404)
+              await db.from("push_subscriptions").delete().eq("id", sub.id);
+            else throw e;
+          }
         }
       }
       await db

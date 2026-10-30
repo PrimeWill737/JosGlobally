@@ -36,7 +36,9 @@ export async function requireStaff(allowed?: readonly string[]) {
   const s = await requireSession();
   if (!s.roles.some((r) => r !== "partner" && r !== "business_representative"))
     redirect("/dashboard");
-  if (s.aal !== "aal2") redirect("/dashboard/security");
+  // Super admin stays in the control panel. Other staff verify from their account.
+  if (s.aal !== "aal2" && !s.roles.includes("super_admin"))
+    redirect("/dashboard/security");
   if (allowed && !s.roles.some((r) => allowed.includes(r)))
     throw new Error("You do not have permission for this operation.");
   return s;

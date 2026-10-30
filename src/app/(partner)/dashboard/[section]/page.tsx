@@ -12,8 +12,7 @@ import {
   refundAction,
 } from "@/lib/server/actions";
 import { Security } from "@/components/Security";
-import { PushSettings } from "@/components/PushSettings";
-import { money, label } from "@/lib/domain";
+import { money, label, shown } from "@/lib/domain";
 import { pool } from "@/lib/server/postgres";
 export default async function PartnerSection({
   params,
@@ -111,7 +110,6 @@ export default async function PartnerSection({
         <div className="page-heading">
           <h1>Notifications</h1>
           <p>Receipt reviews, programme updates and support messages.</p>
-          <PushSettings />
         </div>
         {data?.length ? (
           data.map((n) => (
@@ -151,7 +149,7 @@ export default async function PartnerSection({
             <article className="panel" key={e.id}>
               <h3>{e.transfer_reference}</h3>
               <p>
-                {money(e.amount_minor)} · {e.transfer_date} · Scanned and stored
+                {money(e.amount_minor)} · {shown(e.transfer_date)} · Scanned and stored
                 privately
               </p>
               <a

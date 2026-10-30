@@ -43,6 +43,6 @@ export async function POST(request: Request) {
     });
     return NextResponse.redirect(new URL("/admin/orders", request.url), 303);
   } catch (e) {
-    return fail(e);
+    return fail(e, request);
   }
 }

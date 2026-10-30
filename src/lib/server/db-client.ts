@@ -15,8 +15,11 @@ const ident = (name: string) => {
 };
 const links: Record<string, Record<string, string>> = {
   orders: { quotes: "quote_id" },
-  contribution_intents: { bank_accounts: "account_id" },
-  payment_evidence: { contribution_intents: "intent_id" },
+  contribution_intents: { bank_accounts: "account_id", profiles: "owner_id" },
+  payment_evidence: {
+    contribution_intents: "intent_id",
+    profiles: "owner_id",
+  },
   refunds: { contributions: "contribution_id" },
 };
 class Query<S extends boolean = false> implements PromiseLike<Result<S>> {

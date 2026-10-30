@@ -55,6 +55,29 @@ export function money(value: string | number | bigint = 0) {
   const n = BigInt(value);
   return `₦${(n / 100n).toLocaleString("en-NG")}.${(n % 100n).toString().padStart(2, "0")}`;
 }
+export function shown(value: unknown) {
+  if (value == null || value === "") return "—";
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) return "—";
+    const dateOnly =
+      value.getHours() === 0 &&
+      value.getMinutes() === 0 &&
+      value.getSeconds() === 0 &&
+      value.getMilliseconds() === 0;
+    return dateOnly
+      ? value.toLocaleDateString("en-GB")
+      : value.toLocaleString("en-GB");
+  }
+  if (typeof value === "bigint") return value.toString();
+  if (typeof value === "object") {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return "—";
+    }
+  }
+  return String(value);
+}
 export function label(value: string) {
   return value.replaceAll("_", " ").replace(/\b\w/g, (s) => s.toUpperCase());
 }

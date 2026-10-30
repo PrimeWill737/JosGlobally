@@ -59,6 +59,6 @@ export async function POST(request: Request) {
       303,
     );
   } catch (e) {
-    return fail(e);
+    return fail(e, request);
   }
 }

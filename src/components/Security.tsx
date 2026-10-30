@@ -1,11 +1,16 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { ActionForm } from "./ActionForm";
 import { PasswordInput } from "./PasswordInput";
 import { deleteAccountAction, setPasswordAction } from "@/lib/server/password-actions";
-export function Security({ hasPassword = false }: { hasPassword?: boolean }) {
+export function Security({
+  hasPassword = false,
+  gate = false,
+}: {
+  hasPassword?: boolean;
+  gate?: boolean;
+}) {
   const [message, setMessage] = useState("");
   const [qr, setQr] = useState("");
   const [ready, setReady] = useState(false);
@@ -41,7 +46,9 @@ export function Security({ hasPassword = false }: { hasPassword?: boolean }) {
       <section className="panel">
         <h2>Authenticator verification</h2>
         <p>
-          Every staff session requires MFA. This also protects your account.
+          {gate
+            ? "Verify your authenticator to operate the control panel. Until then, reviews and confirmations stay locked."
+            : "Every staff session requires MFA. This also protects your account."}
         </p>
         <button
           className="button"
@@ -129,9 +136,15 @@ export function Security({ hasPassword = false }: { hasPassword?: boolean }) {
           </div>
         )}
         {verified && (
-          <Link href="/admin" className="button">
-            Continue to operations <ArrowRight size={16} aria-hidden="true" />
-          </Link>
+          <button
+            type="button"
+            className="button"
+            onClick={() => {
+              window.location.assign("/admin");
+            }}
+          >
+            Open the control panel <ArrowRight size={16} aria-hidden="true" />
+          </button>
         )}
         <details>
           <summary>Use a one-time recovery code</summary>
@@ -183,6 +196,8 @@ export function Security({ hasPassword = false }: { hasPassword?: boolean }) {
           Sign out all my sessions
         </button>
       </section>
+      {!gate && (
+      <>
       <section className="panel">
         <h2>Password sign-in</h2>
         <p>
@@ -250,6 +265,8 @@ export function Security({ hasPassword = false }: { hasPassword?: boolean }) {
           </label>
         </ActionForm>
       </section>
+      </>
+      )}
     </>
   );
 }

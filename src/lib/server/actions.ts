@@ -5,7 +5,12 @@ import { z } from "zod";
 import { appUrl } from "@/lib/server/app-url";
 import { database, service } from "@/lib/server/database";
 import { requireSession, requireStaff } from "./auth";
-import { modules, partnerModules, contentModules } from "@/lib/modules";
+import {
+  modules,
+  partnerModules,
+  memberModule,
+  contentModules,
+} from "@/lib/modules";
 import { parseNaira, roles } from "@/lib/domain";
 export type ActionState = { ok?: boolean; message: string };
 const str = (f: FormData, k: string) => String(f.get(k) ?? "").trim();
@@ -127,6 +132,10 @@ export async function recordAction(
     if (!m) throw new Error("Unknown module");
     const staff = f.get("staff") === "yes";
     if (staff) {
+      if (memberModule(key))
+        throw new Error(
+          "Members submit this themselves. Review their records from the control panel.",
+        );
       await requireStaff([
         m.role,
         "super_admin",
@@ -263,8 +272,8 @@ export async function financeAction(
     const op = str(f, "operation");
     await requireStaff(
       op === "confirm" || op === "refund-paid"
-        ? ["finance_approver"]
-        : ["finance_reviewer"],
+        ? ["finance_approver", "super_admin"]
+        : ["finance_reviewer", "super_admin"],
     );
     const db = await database();
     let result;
@@ -307,13 +316,35 @@ export async function financeAction(
           bank_ref: str(f, "bank_reference"),
         });
         break;
+      case "delete-evidence":
+        result = await db.rpc("hard_delete_evidence", {
+          eid: uuid(f, "evidence_id"),
+        });
+        break;
       default:
         throw new Error("Unknown operation");
     }
     if (result.error) throw result.error;
+    if (op === "delete-evidence" && typeof result.data === "string" && result.data) {
+      const removed = await service().storage.from("receipts").remove([result.data]);
+      if (removed.error)
+        throw new Error(
+          "The receipt record was deleted, but the stored file could not be removed.",
+        );
+    }
     revalidatePath("/admin");
+    revalidatePath("/admin/donations");
+    revalidatePath("/admin/payments");
+    revalidatePath("/admin/finance");
+    revalidatePath("/admin/reconciliation");
     revalidatePath("/dashboard");
-    return { ok: true, message: "Operation recorded with an audit trail." };
+    return {
+      ok: true,
+      message:
+        op === "delete-evidence"
+          ? "Receipt permanently deleted."
+          : "Operation recorded with an audit trail.",
+    };
   } catch (e) {
     return error(e);
   }

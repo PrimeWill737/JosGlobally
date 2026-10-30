@@ -8,16 +8,24 @@ export function ActionForm({
   submit = "Save",
   className = "form",
   buttonClass = "button",
+  confirm,
 }: {
   action: (state: ActionState, data: FormData) => Promise<ActionState>;
   children: React.ReactNode;
   submit?: string;
   className?: string;
   buttonClass?: string;
+  confirm?: string;
 }) {
   const [state, formAction, pending] = useActionState(action, { message: "" });
   return (
-    <form action={formAction} className={className}>
+    <form
+      action={formAction}
+      className={className}
+      onSubmit={(event) => {
+        if (confirm && !window.confirm(confirm)) event.preventDefault();
+      }}
+    >
       {children}
       <button
         className={buttonClass}

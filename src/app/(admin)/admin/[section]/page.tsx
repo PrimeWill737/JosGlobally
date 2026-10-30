@@ -8,7 +8,8 @@ import { ModuleView } from "@/components/ModuleView";
 import { ActionForm } from "@/components/ActionForm";
 import { DataTable } from "@/components/DataTable";
 import { financeAction, roleAction, launchAction } from "@/lib/server/actions";
-import { roles, label, money } from "@/lib/domain";
+import { roles, label, money, shown } from "@/lib/domain";
+import { pool } from "@/lib/server/postgres";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 export default async function AdminSection({
   params,
@@ -229,7 +230,7 @@ export default async function AdminSection({
   if (
     ["finance", "payments", "donations", "reconciliation"].includes(section)
   ) {
-    await requireStaff(["finance_reviewer", "finance_approver", "auditor"]);
+    await requireStaff(["finance_reviewer", "finance_approver", "auditor", "super_admin"]);
     const [
       { data: intents },
       { data: entries },
@@ -238,10 +239,11 @@ export default async function AdminSection({
       { data: refunds },
       { data: ledger },
       { data: accounts },
+      { data: settledRows },
     ] = await Promise.all([
       db
         .from("contribution_intents")
-        .select("*")
+        .select("*,profiles(full_name)")
         .in(
           "purpose",
           section === "payments"
@@ -259,7 +261,9 @@ export default async function AdminSection({
         .limit(200),
       db
         .from("payment_evidence")
-        .select("*,contribution_intents!inner(purpose)")
+        .select(
+          "*,contribution_intents!inner(reference,purpose,status,amount_minor,account_id),profiles(full_name,category,city,country)",
+        )
         .in(
           "contribution_intents.purpose",
           section === "payments"
@@ -282,7 +286,20 @@ export default async function AdminSection({
         .order("created_at", { ascending: false })
         .limit(1000),
       db.from("bank_accounts").select("*").eq("approved", true),
+      db.from("contributions").select("intent_id").limit(2000),
     ]);
+    const settled = new Set((settledRows ?? []).map((row) => row.intent_id));
+    const ownerIds = [...new Set((evidence ?? []).map((row) => row.owner_id))];
+    const emailByOwner = new Map<string, string>();
+    if (ownerIds.length) {
+      const { rows } = await pool.query<{ id: string; email: string }>(
+        "select id, email from app_auth.users where id = any($1::uuid[])",
+        [ownerIds],
+      );
+      for (const row of rows) emailByOwner.set(row.id, row.email);
+    }
+    const canDelete =
+      s.roles.includes("finance_reviewer") || s.roles.includes("super_admin");
     const matched = new Set(matches?.map((m) => m.bank_entry_id));
     const unmatched = entries?.filter((e) => !matched.has(e.id)) ?? [];
     const overdue =
@@ -347,41 +364,139 @@ export default async function AdminSection({
           Contribution queue
         </h2>
         <DataTable
-          rows={intents ?? []}
+          rows={(intents ?? []).map((i) => ({
+            reference: i.reference,
+            member: i.profiles?.full_name || "—",
+            purpose: i.purpose,
+            amount: money(i.amount_minor),
+            status: i.status,
+            created_at: i.created_at,
+            id: i.id,
+          }))}
           columns={[
-            "id",
             "reference",
+            "member",
             "purpose",
-            "owner_id",
-            "amount_minor",
+            "amount",
             "status",
             "created_at",
+            "id",
           ]}
         />
         <h2 className="section-title">Receipt evidence</h2>
-        {evidence?.map((e) => (
-          <div className="panel" key={e.id}>
-            <div className="row">
-              <span>
-                {e.transfer_reference} · {money(e.amount_minor)} ·{" "}
-                {e.transfer_date}
-              </span>
-              <a
-                className="text-link"
-                href={`/api/evidence/${e.id}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Open private evidence <ArrowUpRight size={16} aria-hidden="true" />
-              </a>
-            </div>
-            <p className="mono">
-              Evidence {e.id}
-              <br />
-              Intent {e.intent_id}
-            </p>
+        {evidence?.length ? (
+          evidence.map((e) => {
+            const intent = e.contribution_intents ?? {};
+            const profile = e.profiles ?? {};
+            const account = accounts?.find((a) => a.id === intent.account_id);
+            const place = [profile.city, profile.country]
+              .filter(Boolean)
+              .join(", ");
+            const amountDiffers =
+              String(e.amount_minor) !== String(intent.amount_minor ?? "");
+            return (
+              <article className="panel record" key={e.id}>
+                <div className="row">
+                  <h3>{profile.full_name || "Member"}</h3>
+                  <span className={`badge ${intent.status ?? ""}`}>
+                    {intent.status ? label(intent.status) : "—"}
+                  </span>
+                </div>
+                <dl>
+                  <div>
+                    <dt>Email</dt>
+                    <dd>{emailByOwner.get(e.owner_id) || "—"}</dd>
+                  </div>
+                  <div>
+                    <dt>Category</dt>
+                    <dd>{profile.category ? label(profile.category) : "—"}</dd>
+                  </div>
+                  <div>
+                    <dt>Location</dt>
+                    <dd>{place || "—"}</dd>
+                  </div>
+                  <div>
+                    <dt>Contribution reference</dt>
+                    <dd className="mono">{intent.reference || "—"}</dd>
+                  </div>
+                  <div>
+                    <dt>Purpose</dt>
+                    <dd>{intent.purpose ? label(intent.purpose) : "—"}</dd>
+                  </div>
+                  <div>
+                    <dt>Expected amount</dt>
+                    <dd>{money(intent.amount_minor ?? 0)}</dd>
+                  </div>
+                  <div>
+                    <dt>Amount on receipt</dt>
+                    <dd>
+                      {money(e.amount_minor)}
+                      {amountDiffers ? " · does not match the contribution" : ""}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Transfer reference</dt>
+                    <dd>{e.transfer_reference}</dd>
+                  </div>
+                  <div>
+                    <dt>Transfer date</dt>
+                    <dd>{shown(e.transfer_date)}</dd>
+                  </div>
+                  <div>
+                    <dt>Destination account</dt>
+                    <dd>
+                      {account
+                        ? `${account.legal_name} · ${account.bank_name} · ${account.account_number}`
+                        : "—"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Submitted</dt>
+                    <dd>{shown(e.created_at)}</dd>
+                  </div>
+                  <div>
+                    <dt>Intent ID</dt>
+                    <dd className="mono">{e.intent_id}</dd>
+                  </div>
+                  <div>
+                    <dt>Evidence ID</dt>
+                    <dd className="mono">{e.id}</dd>
+                  </div>
+                </dl>
+                <p className="mono">SHA-256 {e.sha256}</p>
+                <a
+                  className="text-link"
+                  href={`/api/evidence/${e.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open private evidence{" "}
+                  <ArrowUpRight size={16} aria-hidden="true" />
+                </a>
+                {settled.has(e.intent_id) ? (
+                  <p>This receipt is part of a confirmed contribution.</p>
+                ) : (
+                  canDelete && (
+                    <ActionForm
+                      action={financeAction}
+                      submit="Delete receipt"
+                      buttonClass="button danger"
+                      confirm="Permanently delete this receipt and its file? The member can submit a new one."
+                    >
+                      <input type="hidden" name="operation" value="delete-evidence" />
+                      <input type="hidden" name="evidence_id" value={e.id} />
+                    </ActionForm>
+                  )
+                )}
+              </article>
+            );
+          })
+        ) : (
+          <div className="empty">
+            <h3>No receipts in this queue.</h3>
+            <p>Submitted transfer evidence will appear here.</p>
           </div>
-        ))}
+        )}
         <div className="workspace-grid">
           {s.roles.includes("finance_reviewer") && (
             <>

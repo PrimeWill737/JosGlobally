@@ -1,4 +1,4 @@
-import { modules } from "@/lib/modules";
+import { memberModule, modules } from "@/lib/modules";
 import { database } from "@/lib/server/database";
 import { recordAction, reviewRecordAction } from "@/lib/server/actions";
 import { ActionForm } from "./ActionForm";
@@ -11,6 +11,7 @@ export async function ModuleView({
   staff?: boolean;
 }) {
   const m = modules[moduleKey];
+  const reviewOnly = staff && memberModule(moduleKey);
   const db = await database();
   const { data: rows, error } = await db
     .from(m.table)
@@ -20,13 +21,20 @@ export async function ModuleView({
   return (
     <>
       <div className="page-heading">
-        <p className="eyebrow">{staff ? "Operations" : "Your partnership"}</p>
+        <p className="eyebrow">
+          {reviewOnly ? "Review queue" : staff ? "Control panel" : "Your partnership"}
+        </p>
         <h1>{m.title}</h1>
-        <p>{m.description}</p>
+        <p>
+          {reviewOnly
+            ? "Members submit these records. Review the queue and record a decision. This panel does not create a contribution for your own account."
+            : m.description}
+        </p>
       </div>
-      <div className="workspace-grid">
+      <div className={reviewOnly ? "workspace-grid single" : "workspace-grid"}>
+        {!reviewOnly && (
         <section className="panel">
-          <h2>{staff ? "Create a draft" : "New submission"}</h2>
+          <h2>{staff ? "Add a platform record" : "New submission"}</h2>
           <ActionForm
             action={recordAction}
             submit={staff ? "Save draft" : "Submit for review"}
@@ -68,8 +76,9 @@ export async function ModuleView({
             ))}
           </ActionForm>
         </section>
+        )}
         <section>
-          <h2>{staff ? "Review queue" : "Your records"}</h2>
+          <h2>{staff ? "Records to review" : "Your records"}</h2>
           {error ? (
             <p className="notice error">
               Records could not be loaded. Check the database connection and
@@ -77,10 +86,11 @@ export async function ModuleView({
             </p>
           ) : !rows?.length ? (
             <div className="empty">
-              <span>◌</span>
-              <h3>A fresh start</h3>
+              <h3>{staff ? "Nothing is waiting" : "A fresh start"}</h3>
               <p>
-                Your {m.title.toLowerCase()} will appear here once submitted.
+                {staff
+                  ? `Member ${m.title.toLowerCase()} will appear here when they are submitted.`
+                  : `Your ${m.title.toLowerCase()} will appear here once submitted.`}
               </p>
             </div>
           ) : (

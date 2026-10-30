@@ -64,9 +64,7 @@ export default async function Shop({
               ))}
             </select>
           </label>
-          <button className="button" style={{ alignSelf: "end" }}>
-            Search
-          </button>
+          <button className="button">Search</button>
         </div>
       </form>
       {products.length ? (

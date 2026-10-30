@@ -54,11 +54,7 @@ export function Cart() {
         <>
           <div className="panel">
             {items.map((i) => (
-              <div
-                className="row"
-                key={i.product_id}
-                style={{ padding: 15, borderBottom: "1px solid #dce0d3" }}
-              >
+              <div className="cart-line" key={i.product_id}>
                 <strong>{i.title}</strong>
                 <label>
                   Quantity{" "}

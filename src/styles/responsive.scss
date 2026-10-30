@@ -572,14 +572,15 @@ article {
     top: env(safe-area-inset-top, 0px);
     z-index: 34;
     background: #fffdf7;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
-  }
-  .workspace-top .row {
-    margin-left: auto;
+    padding-block: 10px;
+    padding-inline: max(0.75rem, env(safe-area-inset-left, 0px))
+      max(0.75rem, env(safe-area-inset-right, 0px));
   }
   .workspace-top .nav-toggle {
     margin-left: 0;
+    flex-shrink: 0;
   }
   .workspace .nav-backdrop {
     z-index: 31;
@@ -592,7 +593,7 @@ article {
     flex-direction: column;
     position: fixed;
     z-index: 33;
-    top: calc(env(safe-area-inset-top, 0px) + 4.75rem);
+    top: calc(env(safe-area-inset-top, 0px) + 72px);
     left: 0;
     bottom: 0;
     width: min(19rem, calc(100vw - 3.5rem));
@@ -614,5 +615,152 @@ article {
   }
   .workspace .sidebar nav a {
     white-space: normal;
+  }
+}
+// Narrow phones: keep the workspace bar on one line.
+@media (max-width: 30rem) {
+  .workspace-user {
+    position: relative;
+    max-width: none;
+    flex: 0 0 auto;
+  }
+  .workspace-user-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+@media (max-width: 23rem) {
+  .crumb-brand,
+  .crumb-sep {
+    display: none;
+  }
+}
+// Shared page pieces: titles, filters, carts, quotes, and actions.
+.row {
+  align-items: flex-start;
+}
+.row > h2,
+.row > h3,
+.row > strong,
+.row > .section-title,
+.row > span:not(.badge):not(.avatar) {
+  flex: 1 1 10rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.row > .badge,
+.row > .text-link,
+.row > a {
+  flex: 0 1 auto;
+  max-width: 100%;
+}
+.record .row > dt {
+  flex: 1 1 8rem;
+  min-width: 0;
+}
+.record .row > dd {
+  flex: 0 1 auto;
+  margin: 0;
+  min-width: 0;
+  text-align: right;
+}
+.eyebrow {
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+.text-link {
+  max-width: 100%;
+  flex-wrap: wrap;
+  white-space: normal;
+}
+.page-heading h1,
+.panel h2,
+.panel h3,
+.section-title {
+  overflow-wrap: anywhere;
+}
+pre {
+  max-width: 100%;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.cart-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border-bottom: 1px solid #dce0d3;
+}
+.cart-line > strong {
+  flex: 1 1 12rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.cart-line label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #123c35;
+}
+.cart-line input[type="number"] {
+  width: 5.5rem;
+}
+@media (max-width: 48rem) {
+  .form > .row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .form > .row > .button,
+  .dashboard-welcome > .button,
+  .panel > .button,
+  .empty > .button {
+    width: 100%;
+  }
+  .link-list > a {
+    flex: 1 1 calc(50% - 12px);
+  }
+  .button {
+    gap: 10px;
+  }
+  .eyebrow {
+    letter-spacing: 0.08em;
+  }
+  .record .row {
+    flex-direction: column;
+    gap: 2px;
+  }
+  .record .row > dd {
+    text-align: left;
+  }
+}
+@media (max-width: 30rem) {
+  .link-list > a {
+    flex-basis: 100%;
+  }
+  .cart-line {
+    align-items: stretch;
+  }
+  .cart-line .text-link {
+    justify-content: flex-start;
+  }
+  .page-heading h1 {
+    font-size: clamp(1.55rem, 8vw, 2rem);
+  }
+  .dashboard-welcome h2 {
+    font-size: clamp(1.35rem, 6vw, 1.7rem);
+  }
+  .stat strong {
+    overflow-wrap: anywhere;
   }
 }
