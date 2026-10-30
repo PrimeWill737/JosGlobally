@@ -7,6 +7,7 @@ import { modules, contentModules } from "@/lib/modules";
 import { ModuleView } from "@/components/ModuleView";
 import { ActionForm } from "@/components/ActionForm";
 import { DataTable } from "@/components/DataTable";
+import { ViewDetails } from "@/components/ViewDetails";
 import { financeAction, roleAction, launchAction } from "@/lib/server/actions";
 import { roles, label, money, shown } from "@/lib/domain";
 import { pool } from "@/lib/server/postgres";
@@ -286,7 +287,10 @@ export default async function AdminSection({
         .order("created_at", { ascending: false })
         .limit(1000),
       db.from("bank_accounts").select("*").eq("approved", true),
-      db.from("contributions").select("intent_id").limit(2000),
+      db
+        .from("contributions")
+        .select("intent_id,amount_minor,purpose")
+        .limit(2000),
     ]);
     const settled = new Set((settledRows ?? []).map((row) => row.intent_id));
     const ownerIds = [...new Set((evidence ?? []).map((row) => row.owner_id))];
@@ -300,8 +304,18 @@ export default async function AdminSection({
     }
     const canDelete =
       s.roles.includes("finance_reviewer") || s.roles.includes("super_admin");
-    const matched = new Set(matches?.map((m) => m.bank_entry_id));
-    const unmatched = entries?.filter((e) => !matched.has(e.id)) ?? [];
+    const purposes =
+      section === "payments"
+        ? ["order"]
+        : section === "donations"
+          ? ["donation"]
+          : ["order", "donation"];
+    const approved =
+      settledRows?.filter((row) => purposes.includes(row.purpose)) ?? [];
+    const approvedAmount = approved.reduce(
+      (total, row) => total + BigInt(row.amount_minor),
+      0n,
+    );
     const overdue =
       intents?.filter(
         (i) =>
@@ -337,13 +351,9 @@ export default async function AdminSection({
             </strong>
           </div>
           <div className="stat">
-            <small>Unmatched bank entries</small>
-            <strong>{unmatched.length}</strong>
-            <p>
-              {money(
-                unmatched.reduce((n, e) => n + BigInt(e.amount_minor), 0n),
-              )}
-            </p>
+            <small>Approved receipts</small>
+            <strong>{approved.length}</strong>
+            <p>{money(approvedAmount)}</p>
           </div>
           <div className="stat">
             <small>Older than 48 hours</small>
@@ -394,14 +404,37 @@ export default async function AdminSection({
               .join(", ");
             const amountDiffers =
               String(e.amount_minor) !== String(intent.amount_minor ?? "");
+            const openForDecision =
+              !settled.has(e.intent_id) &&
+              ["proof_submitted", "needs_information", "under_review"].includes(
+                intent.status,
+              );
+            const canApprove =
+              openForDecision &&
+              ["proof_submitted", "under_review"].includes(intent.status) &&
+              (s.roles.includes("finance_approver") ||
+                s.roles.includes("super_admin"));
+            const canReject =
+              openForDecision &&
+              (s.roles.includes("finance_reviewer") ||
+                s.roles.includes("super_admin"));
             return (
-              <article className="panel record" key={e.id}>
-                <div className="row">
-                  <h3>{profile.full_name || "Member"}</h3>
+              <ViewDetails
+                key={e.id}
+                title={profile.full_name || "Member"}
+                badge={
                   <span className={`badge ${intent.status ?? ""}`}>
                     {intent.status ? label(intent.status) : "—"}
                   </span>
-                </div>
+                }
+                detail={
+                  <>
+                    <span className="mono">{intent.reference || "—"}</span>
+                    <span>{shown(e.transfer_date)}</span>
+                  </>
+                }
+                amount={money(e.amount_minor)}
+              >
                 <dl>
                   <div>
                     <dt>Email</dt>
@@ -464,31 +497,78 @@ export default async function AdminSection({
                   </div>
                 </dl>
                 <p className="mono">SHA-256 {e.sha256}</p>
-                <a
-                  className="text-link"
-                  href={`/api/evidence/${e.id}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open private evidence{" "}
-                  <ArrowUpRight size={16} aria-hidden="true" />
-                </a>
-                {settled.has(e.intent_id) ? (
-                  <p>This receipt is part of a confirmed contribution.</p>
-                ) : (
-                  canDelete && (
-                    <ActionForm
-                      action={financeAction}
-                      submit="Delete receipt"
-                      buttonClass="button danger"
-                      confirm="Permanently delete this receipt and its file? The member can submit a new one."
+                <div className="evidence-decision">
+                  {canReject && (
+                    <label className="evidence-reason" htmlFor={`reject-note-${e.id}`}>
+                      Reason for rejection
+                      <textarea
+                        id={`reject-note-${e.id}`}
+                        name="note"
+                        form={`reject-${e.id}`}
+                        required
+                        minLength={5}
+                        rows={3}
+                      />
+                    </label>
+                  )}
+                  <div className="evidence-actions">
+                    {canApprove && (
+                      <ActionForm
+                        action={financeAction}
+                        submit="Approve"
+                        className="evidence-action"
+                        buttonClass="button"
+                        icon={false}
+                        confirm="Approve this contribution as settled?"
+                      >
+                        <input type="hidden" name="operation" value="approve" />
+                        <input type="hidden" name="evidence_id" value={e.id} />
+                      </ActionForm>
+                    )}
+                    {canReject && (
+                      <ActionForm
+                        id={`reject-${e.id}`}
+                        action={financeAction}
+                        submit="Reject"
+                        className="evidence-action"
+                        buttonClass="button danger"
+                        icon={false}
+                        confirm="Reject this receipt?"
+                      >
+                        <input type="hidden" name="operation" value="decision" />
+                        <input type="hidden" name="decision" value="rejected" />
+                        <input type="hidden" name="intent_id" value={e.intent_id} />
+                      </ActionForm>
+                    )}
+                    <a
+                      className="button outline"
+                      href={`/api/evidence/${e.id}`}
+                      target="_blank"
+                      rel="noreferrer"
                     >
-                      <input type="hidden" name="operation" value="delete-evidence" />
-                      <input type="hidden" name="evidence_id" value={e.id} />
-                    </ActionForm>
-                  )
-                )}
-              </article>
+                      Open evidence
+                      <ArrowUpRight size={16} aria-hidden="true" />
+                    </a>
+                    {canDelete && (
+                      <ActionForm
+                        action={financeAction}
+                        submit="Delete receipt"
+                        className="evidence-action"
+                        buttonClass="button danger"
+                        icon={false}
+                        confirm="Permanently delete this receipt and its file? The member can submit a new one."
+                      >
+                        <input
+                          type="hidden"
+                          name="operation"
+                          value="delete-evidence"
+                        />
+                        <input type="hidden" name="evidence_id" value={e.id} />
+                      </ActionForm>
+                    )}
+                  </div>
+                </div>
+              </ViewDetails>
             );
           })
         ) : (

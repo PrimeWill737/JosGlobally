@@ -271,7 +271,7 @@ export async function financeAction(
   try {
     const op = str(f, "operation");
     await requireStaff(
-      op === "confirm" || op === "refund-paid"
+      op === "confirm" || op === "approve" || op === "refund-paid"
         ? ["finance_approver", "super_admin"]
         : ["finance_reviewer", "super_admin"],
     );
@@ -299,6 +299,11 @@ export async function financeAction(
       case "confirm":
         result = await db.rpc("confirm_contribution", {
           iid: uuid(f, "intent_id"),
+        });
+        break;
+      case "approve":
+        result = await db.rpc("approve_receipt", {
+          eid: uuid(f, "evidence_id"),
         });
         break;
       case "decision":
@@ -343,7 +348,11 @@ export async function financeAction(
       message:
         op === "delete-evidence"
           ? "Receipt permanently deleted."
-          : "Operation recorded with an audit trail.",
+          : op === "approve"
+            ? "Contribution approved."
+            : op === "decision" && str(f, "decision") === "rejected"
+              ? "Receipt rejected."
+              : "Operation recorded with an audit trail.",
     };
   } catch (e) {
     return error(e);

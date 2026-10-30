@@ -25,7 +25,11 @@ export function DataTable({
           {rows.map((r, index) => (
             <tr key={String(r.id ?? index)}>
               {columns.map((c) => (
-                <td key={c}>{shown(r[c])}</td>
+                <td key={c} className={c === "status" ? "cell-status" : undefined}>
+                  {c === "status" && typeof r[c] === "string"
+                    ? label(r[c])
+                    : shown(r[c])}
+                </td>
               ))}
             </tr>
           ))}

@@ -101,7 +101,8 @@ textarea {
   overscroll-behavior-inline: contain;
 }
 .table-wrap table {
-  min-width: 36rem;
+  width: max-content;
+  min-width: 100%;
 }
 .sidebar {
   height: 100dvh;
